@@ -2,9 +2,7 @@
 namespace View.Line
 {
     import DragPoint = View.Points.DragPoint;
-
     export class LineManager {
-
         private _lineList:LineObject[] = [];
         private readonly _layer:SVGElement;
         constructor(g:SVGElement) {
@@ -48,7 +46,6 @@ namespace View.Line
                 let line:LineObject = this._lineList[i];
                 line.remove();
             }
-
             this._lineList = [];
         }
 
@@ -60,9 +57,6 @@ namespace View.Line
                 let line:LineObject = this._lineList[i];
                 line.draw();
             }
-
         }
-
-
     }
 }

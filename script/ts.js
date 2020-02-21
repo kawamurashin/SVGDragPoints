@@ -283,8 +283,8 @@ var View;
 })(View || (View = {}));
 var View;
 (function (View) {
-    var RedPoint = View.Points.MovePoint;
-    var BlackPoint = View.Points.PinPoint;
+    var MovePoint = View.Points.MovePoint;
+    var PinPoint = View.Points.PinPoint;
     var LineManager = View.Line.LineManager;
     var ViewManager = (function () {
         function ViewManager() {
@@ -299,10 +299,10 @@ var View;
         }
         ViewManager.prototype.enterFrame = function () {
             this._lineManager.enterFrame();
-            var n = this._redPointList.length;
+            var n = this._movePointList.length;
             for (var i = 0; i < n; i++) {
-                var redPoint = this._redPointList[i];
-                redPoint.enterFrame();
+                var movePoint = this._movePointList[i];
+                movePoint.enterFrame();
             }
         };
         ViewManager.prototype.resize = function () {
@@ -312,7 +312,7 @@ var View;
                 dragPoint.remove();
             }
             this._dragPointList = [];
-            this._redPointList = [];
+            this._movePointList = [];
             this._lineManager.removeAll();
             this.setPoints();
         };
@@ -321,7 +321,7 @@ var View;
             var handler = function (eventData) {
                 _this.mouseDown(eventData);
             };
-            this._redPointList = [];
+            this._movePointList = [];
             this._dragPointList = [];
             var dragPoint;
             var svg = document.getElementById("svg");
@@ -336,14 +336,14 @@ var View;
             var n = ViewManager.countX * ViewManager.countY;
             for (var i = 0; i < n; i++) {
                 if (Math.floor(i / ViewManager.countX) == 0 || Math.floor(i / ViewManager.countX) == ViewManager.countY - 1 || i % ViewManager.countX == 0 || i % ViewManager.countX == ViewManager.countX - 1) {
-                    dragPoint = new BlackPoint(this._pointLayer);
+                    dragPoint = new PinPoint(this._pointLayer);
                     dragPoint.x = marginX + ViewManager.DISTANCE * (i % ViewManager.countX);
                     dragPoint.y = marginY + ViewManager.DISTANCE * Math.floor(i / ViewManager.countX);
                 }
                 else {
-                    dragPoint = new RedPoint(this._pointLayer);
-                    if (dragPoint instanceof RedPoint) {
-                        this._redPointList.push(dragPoint);
+                    dragPoint = new MovePoint(this._pointLayer);
+                    if (dragPoint instanceof MovePoint) {
+                        this._movePointList.push(dragPoint);
                     }
                     dragPoint.x = 10 - 20 * Math.random() + marginX + ViewManager.DISTANCE * (i % ViewManager.countX);
                     dragPoint.y = 10 - 20 * Math.random() + marginY + ViewManager.DISTANCE * Math.floor(i / ViewManager.countX);
@@ -415,7 +415,6 @@ var Main = (function () {
             _this.enterFrame();
         };
         var resize = function () {
-            console.log("rezie fhoge 2");
             _this.resize();
         };
         this._viewManager = new ViewManager();
@@ -434,20 +433,6 @@ var Main = (function () {
 window.addEventListener("load", function () {
     main = new Main();
 });
-var View;
-(function (View) {
-    var Events;
-    (function (Events) {
-        var ViewEvent = (function () {
-            function ViewEvent(str) {
-                if (str === void 0) { str = null; }
-            }
-            ViewEvent.CLICK = "view_click";
-            return ViewEvent;
-        }());
-        Events.ViewEvent = ViewEvent;
-    })(Events = View.Events || (View.Events = {}));
-})(View || (View = {}));
 var View;
 (function (View) {
     var Line;

@@ -42,9 +42,7 @@ namespace View.Points
             this._circle.setAttributeNS(null, "cx", "0");
             this._circle.setAttributeNS(null, "cy", "0");
             this._circle.setAttributeNS(null, "r", "10");
-
             this._circle.addEventListener("mousedown", mousedown);
-
             this._g.appendChild(this._circle);
         }
         public enterFrame():void
@@ -74,9 +72,8 @@ namespace View.Points
         public remove():void
         {
             this._g.removeChild(this._circle);
-
             this._topPoint = null;
-            this._bottomPoint = null
+            this._bottomPoint = null;
             this._rightPoint = null;
             this._leftPoint = null;
         }

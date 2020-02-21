@@ -1,12 +1,10 @@
 namespace View.Line
 {
     import DragPoint = View.Points.DragPoint;
-
     export class LineObject {
         private _startPoint:DragPoint;
         private _endPoint:DragPoint;
-
-        private _path:SVGElement;
+        private readonly _path:SVGElement;
         private _g:SVGElement;
         constructor(g:SVGElement,startPoint:DragPoint, endPoint:DragPoint) {
             this._g = g;
@@ -34,6 +32,5 @@ namespace View.Line
             const value: string = "M " + this._startPoint.x + "," + this._startPoint.y + " L " + this._endPoint.x + "," + this._endPoint.y + " Z";
             this._path.setAttribute("d", value);
         }
-
     }
 }

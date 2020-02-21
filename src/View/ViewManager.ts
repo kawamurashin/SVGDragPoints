@@ -3,30 +3,21 @@
 ///<reference path="Points/PinPoint.ts"/>
 ///<reference path="Line/LineManager.ts"/>
 namespace View {
-    import RedPoint = View.Points.MovePoint;
+    import MovePoint = View.Points.MovePoint;
     import DragPoint = View.Points.DragPoint;
     import EventData = View.Data.EventData;
-    import BlackPoint = View.Points.PinPoint;
+    import PinPoint = View.Points.PinPoint;
     import LineManager = View.Line.LineManager;
 
     export class ViewManager {
-        private _redPointList: RedPoint[];
+        private _movePointList: MovePoint[];
         private _lineManager: LineManager;
         private _dragPoint: DragPoint;
         private _preX: number;
         private _preY: number;
-
-        //public static COUNT_X: number = 8;
-        //public static COUNT_Y: number = 8;
         public static DISTANCE:number = 100;
         //
-        //private _marginX:number;
-        //private _marginY:number;
-        //private _svg:HTMLElement;
-        //private readonly _lineLayer:SVGElement;
-
         private _dragPointList:DragPoint[] = [];
-
         public static countX:number;
         public static countY:number;
         private readonly _pointLayer:SVGElement;
@@ -45,13 +36,12 @@ namespace View {
 
             /**/
             this._lineManager.enterFrame();
-            let n:number = this._redPointList.length;
+            let n:number = this._movePointList.length;
             for(let i:number = 0;i<n;i++)
             {
-                let redPoint:RedPoint = this._redPointList[i];
-                redPoint.enterFrame();
+                let movePoint:MovePoint = this._movePointList[i];
+                movePoint.enterFrame();
             }
-
         }
         public resize():void
         {
@@ -62,10 +52,10 @@ namespace View {
                 dragPoint.remove();
             }
             this._dragPointList = [];
-            this._redPointList = [];
+            this._movePointList = [];
             //
             this._lineManager.removeAll();
-
+            //
             this.setPoints();
         }
         //
@@ -74,16 +64,9 @@ namespace View {
             const handler = (eventData: EventData) => {
                 this.mouseDown(eventData);
             };
-            this._redPointList = [];
+            this._movePointList = [];
             this._dragPointList = [];
             let dragPoint: DragPoint;
-
-            /*
-            let dx: number = (400 - (this._marginX * 2)) / (ViewManager.COUNT_X - 1);
-            console.log("dx " + dx)
-            console.log("dx " + dx)
-            let dy: number = (400 - (this._marginY * 2)) / (ViewManager.COUNT_Y - 1);
-             */
             let svg:HTMLElement = document.getElementById("svg");
             let width = document.body.clientWidth;
             let height = document.body.clientHeight;
@@ -98,14 +81,14 @@ namespace View {
             for (let i = 0; i < n; i++) {
 
                 if (Math.floor(i / ViewManager.countX) == 0 || Math.floor(i / ViewManager.countX) == ViewManager.countY - 1 || i % ViewManager.countX == 0 || i % ViewManager.countX == ViewManager.countX - 1) {
-                    dragPoint = new BlackPoint(this._pointLayer);
+                    dragPoint = new PinPoint(this._pointLayer);
 
                     dragPoint.x = marginX + ViewManager.DISTANCE * (i % ViewManager.countX);
                     dragPoint.y = marginY + ViewManager.DISTANCE * Math.floor(i / ViewManager.countX);
                 } else {
-                    dragPoint = new RedPoint(this._pointLayer);
-                    if (dragPoint instanceof RedPoint) {
-                        this._redPointList.push(dragPoint);
+                    dragPoint = new MovePoint(this._pointLayer);
+                    if (dragPoint instanceof MovePoint) {
+                        this._movePointList.push(dragPoint);
                     }
                     dragPoint.x = 10 - 20 * Math.random() + marginX + ViewManager.DISTANCE * (i % ViewManager.countX);
                     dragPoint.y = 10 - 20 * Math.random() + marginY + ViewManager.DISTANCE * Math.floor(i / ViewManager.countX);
@@ -139,7 +122,6 @@ namespace View {
                 dragPoint.setPoints(top,bottom,right,left);
             }
             //Line
-            //this._lineManager = new LineManager(this._lineLayer, pointList);
             this._lineManager.setPointList(this._dragPointList);
         }
 

@@ -9,7 +9,6 @@ class Main {
         };
         const resize = () =>
         {
-            console.log("rezie fhoge 2")
             this.resize();
         };
         this._viewManager = new ViewManager();
