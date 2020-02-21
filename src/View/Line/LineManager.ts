@@ -5,32 +5,10 @@ namespace View.Line
 
     export class LineManager {
 
-        private readonly _lineList:LineObject[];
-        constructor(g:SVGElement , pointList:DragPoint[]) {
-
-
-            this._lineList = [];
-            let n:number = pointList.length- 1;
-            for(let i:number = 0;i<n;i++)
-            {
-                if(i%ViewManager.COUNT_X != ViewManager.COUNT_X-1)
-                {
-                    let startPoint:DragPoint = pointList[i];
-                    let endPoint:DragPoint = pointList[i+1];
-                    let line:LineObject = new LineObject(g,startPoint,endPoint);
-                    this._lineList.push(line);
-                }
-            }
-
-            n = pointList.length - ViewManager.COUNT_X;
-            for(let i:number = 0;i<n;i++)
-            {
-                let startPoint:DragPoint = pointList[i];
-                let endPoint:DragPoint = pointList[i+ViewManager.COUNT_X];
-                let line:LineObject = new LineObject(g,startPoint,endPoint);
-                this._lineList.push(line);
-            }
-            this.draw();
+        private _lineList:LineObject[];
+        private readonly _layer:SVGElement;
+        constructor(g:SVGElement) {
+            this._layer = g;
         }
 
         public enterFrame():void
@@ -38,6 +16,31 @@ namespace View.Line
             this.draw();
 
         }
+        setPointList(pointList: DragPoint[]) {
+            this._lineList = [];
+            let n:number = pointList.length- 1;
+            for(let i:number = 0;i<n;i++)
+            {
+                if(i%ViewManager.countX != ViewManager.countX-1)
+                {
+                    let startPoint:DragPoint = pointList[i];
+                    let endPoint:DragPoint = pointList[i+1];
+                    let line:LineObject = new LineObject(this._layer,startPoint,endPoint);
+                    this._lineList.push(line);
+                }
+            }
+
+            n = pointList.length - ViewManager.countX;
+            for(let i:number = 0;i<n;i++)
+            {
+                let startPoint:DragPoint = pointList[i];
+                let endPoint:DragPoint = pointList[i+ViewManager.countX];
+                let line:LineObject = new LineObject(this._layer,startPoint,endPoint);
+                this._lineList.push(line);
+            }
+            this.draw();
+        }
+
         private draw():void
         {
             let n:number = this._lineList.length;
@@ -48,6 +51,7 @@ namespace View.Line
             }
 
         }
+
 
     }
 }

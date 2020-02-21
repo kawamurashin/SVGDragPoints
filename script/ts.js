@@ -226,27 +226,30 @@ var View;
     var Line;
     (function (Line) {
         var LineManager = (function () {
-            function LineManager(g, pointList) {
+            function LineManager(g) {
+                this._layer = g;
+            }
+            LineManager.prototype.enterFrame = function () {
+                this.draw();
+            };
+            LineManager.prototype.setPointList = function (pointList) {
                 this._lineList = [];
                 var n = pointList.length - 1;
                 for (var i = 0; i < n; i++) {
-                    if (i % View.ViewManager.COUNT_X != View.ViewManager.COUNT_X - 1) {
+                    if (i % View.ViewManager.countX != View.ViewManager.countX - 1) {
                         var startPoint = pointList[i];
                         var endPoint = pointList[i + 1];
-                        var line = new Line.LineObject(g, startPoint, endPoint);
+                        var line = new Line.LineObject(this._layer, startPoint, endPoint);
                         this._lineList.push(line);
                     }
                 }
-                n = pointList.length - View.ViewManager.COUNT_X;
+                n = pointList.length - View.ViewManager.countX;
                 for (var i = 0; i < n; i++) {
                     var startPoint = pointList[i];
-                    var endPoint = pointList[i + View.ViewManager.COUNT_X];
-                    var line = new Line.LineObject(g, startPoint, endPoint);
+                    var endPoint = pointList[i + View.ViewManager.countX];
+                    var line = new Line.LineObject(this._layer, startPoint, endPoint);
                     this._lineList.push(line);
                 }
-                this.draw();
-            }
-            LineManager.prototype.enterFrame = function () {
                 this.draw();
             };
             LineManager.prototype.draw = function () {
@@ -268,34 +271,56 @@ var View;
     var LineManager = View.Line.LineManager;
     var ViewManager = (function () {
         function ViewManager() {
+            var svg = document.getElementById("svg");
+            var lineLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            svg.appendChild(lineLayer);
+            this._pointLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            svg.appendChild(this._pointLayer);
+            this._lineManager = new LineManager(lineLayer);
+            this.resize();
+        }
+        ViewManager.prototype.enterFrame = function () {
+            this._lineManager.enterFrame();
+            var n = this._redPointList.length;
+            for (var i = 0; i < n; i++) {
+                var redPoint = this._redPointList[i];
+                redPoint.enterFrame();
+            }
+        };
+        ViewManager.prototype.resize = function () {
+            this.setPoints();
+        };
+        ViewManager.prototype.setPoints = function () {
             var _this = this;
             var handler = function (eventData) {
                 _this.mouseDown(eventData);
             };
-            var svg = document.getElementById("svg");
-            var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-            svg.appendChild(g);
             this._redPointList = [];
             var pointList = [];
             var dragPoint;
-            var marginX = 20;
-            var marginY = 20;
-            var dx = (400 - (marginX * 2)) / (ViewManager.COUNT_X - 1);
-            var dy = (400 - (marginY * 2)) / (ViewManager.COUNT_Y - 1);
-            var n = ViewManager.COUNT_X * ViewManager.COUNT_Y;
+            var svg = document.getElementById("svg");
+            var width = document.body.clientWidth;
+            var height = document.body.clientHeight;
+            ViewManager.countX = Math.floor((width - 100) / ViewManager.DISTANCE);
+            ViewManager.countY = Math.floor((height - 100) / ViewManager.DISTANCE);
+            var marginX = 50 + (width - (ViewManager.countX * ViewManager.DISTANCE)) * 0.5;
+            var marginY = 50 + (height - (ViewManager.countY * ViewManager.DISTANCE)) * 0.5;
+            svg.setAttribute("width", width.toString());
+            svg.setAttribute("height", height.toString());
+            var n = ViewManager.countX * ViewManager.countY;
             for (var i = 0; i < n; i++) {
-                if (Math.floor(i / ViewManager.COUNT_X) == 0 || Math.floor(i / ViewManager.COUNT_X) == ViewManager.COUNT_Y - 1 || i % ViewManager.COUNT_X == 0 || i % ViewManager.COUNT_X == ViewManager.COUNT_X - 1) {
-                    dragPoint = new BlackPoint(g);
-                    dragPoint.x = marginX + dx * (i % ViewManager.COUNT_X);
-                    dragPoint.y = marginY + dy * Math.floor(i / ViewManager.COUNT_X);
+                if (Math.floor(i / ViewManager.countX) == 0 || Math.floor(i / ViewManager.countX) == ViewManager.countY - 1 || i % ViewManager.countX == 0 || i % ViewManager.countX == ViewManager.countX - 1) {
+                    dragPoint = new BlackPoint(this._pointLayer);
+                    dragPoint.x = marginX + ViewManager.DISTANCE * (i % ViewManager.countX);
+                    dragPoint.y = marginY + ViewManager.DISTANCE * Math.floor(i / ViewManager.countX);
                 }
                 else {
-                    dragPoint = new RedPoint(g);
+                    dragPoint = new RedPoint(this._pointLayer);
                     if (dragPoint instanceof RedPoint) {
                         this._redPointList.push(dragPoint);
                     }
-                    dragPoint.x = 10 - 20 * Math.random() + marginX + dx * (i % ViewManager.COUNT_X);
-                    dragPoint.y = 10 - 20 * Math.random() + marginY + dy * Math.floor(i / ViewManager.COUNT_X);
+                    dragPoint.x = 10 - 20 * Math.random() + marginX + ViewManager.DISTANCE * (i % ViewManager.countX);
+                    dragPoint.y = 10 - 20 * Math.random() + marginY + ViewManager.DISTANCE * Math.floor(i / ViewManager.countX);
                 }
                 dragPoint.addListener("mousedown", handler);
                 pointList.push(dragPoint);
@@ -307,29 +332,21 @@ var View;
             n = pointList.length;
             for (var i = 0; i < n; i++) {
                 dragPoint = pointList[i];
-                if (Math.floor(i / ViewManager.COUNT_X) != 0) {
-                    top = pointList[i - ViewManager.COUNT_X];
+                if (Math.floor(i / ViewManager.countX) != 0) {
+                    top = pointList[i - ViewManager.countX];
                 }
-                if (Math.floor(i / ViewManager.COUNT_X) != ViewManager.COUNT_Y - 1) {
-                    bottom = pointList[i + ViewManager.COUNT_X];
+                if (Math.floor(i / ViewManager.countX) != ViewManager.countY - 1) {
+                    bottom = pointList[i + ViewManager.countX];
                 }
-                if (i % ViewManager.COUNT_X != ViewManager.COUNT_X - 1) {
+                if (i % ViewManager.countX != ViewManager.countX - 1) {
                     right = pointList[i + 1];
                 }
-                if (i / ViewManager.COUNT_X != 0) {
+                if (i / ViewManager.countX != 0) {
                     left = pointList[i - 1];
                 }
                 dragPoint.setPoints(top, bottom, right, left);
             }
-            this._lineManager = new LineManager(g, pointList);
-        }
-        ViewManager.prototype.enterFrame = function () {
-            this._lineManager.enterFrame();
-            var n = this._redPointList.length;
-            for (var i = 0; i < n; i++) {
-                var redPoint = this._redPointList[i];
-                redPoint.enterFrame();
-            }
+            this._lineManager.setPointList(pointList);
         };
         ViewManager.prototype.mouseDown = function (eventData) {
             var _this = this;
@@ -358,8 +375,7 @@ var View;
             this._preX = e.screenX;
             this._preY = e.screenY;
         };
-        ViewManager.COUNT_X = 8;
-        ViewManager.COUNT_Y = 8;
+        ViewManager.DISTANCE = 100;
         return ViewManager;
     }());
     View.ViewManager = ViewManager;
@@ -372,12 +388,19 @@ var Main = (function () {
         var interval = function () {
             _this.enterFrame();
         };
+        var resize = function () {
+            console.log("rezie fhoge");
+            _this.resize();
+        };
         this._viewManager = new ViewManager();
+        window.addEventListener('resize', resize);
         var fps = 60 / 1000;
         setInterval(interval, fps);
     }
     Main.prototype.enterFrame = function () {
         this._viewManager.enterFrame();
+    };
+    Main.prototype.resize = function () {
     };
     return Main;
 }());
