@@ -4,12 +4,12 @@ html, body {
     height: 100%; }
 
 body {
-    background-color: #EEEEEE;
+    background-color: #333;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 #svg
 {
-    background-color: #FFFFFF;
+    background-color: #333;
 }

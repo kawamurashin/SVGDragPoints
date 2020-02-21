@@ -30,9 +30,10 @@ namespace View.Points
         protected _bottomPoint:DragPoint;
         protected _leftPoint:DragPoint;
         protected _rightPoint:DragPoint;
+        private _g:SVGElement;
         constructor(g:SVGElement) {
-
             super();
+            this._g = g;
             const mousedown = (e) =>
             {
                 this.mouseDownHandler(e);
@@ -44,7 +45,7 @@ namespace View.Points
 
             this._circle.addEventListener("mousedown", mousedown);
 
-            g.appendChild(this._circle);
+            this._g.appendChild(this._circle);
         }
         public enterFrame():void
         {
@@ -69,6 +70,17 @@ namespace View.Points
                 this._leftPoint = left;
             }
         }
+
+        public remove():void
+        {
+            this._g.removeChild(this._circle);
+
+            this._topPoint = null;
+            this._bottomPoint = null
+            this._rightPoint = null;
+            this._leftPoint = null;
+        }
+
         public mouseDown():void
         {
 

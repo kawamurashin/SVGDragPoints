@@ -5,7 +5,7 @@ namespace View.Line
 
     export class LineManager {
 
-        private _lineList:LineObject[];
+        private _lineList:LineObject[] = [];
         private readonly _layer:SVGElement;
         constructor(g:SVGElement) {
             this._layer = g;
@@ -16,7 +16,7 @@ namespace View.Line
             this.draw();
 
         }
-        setPointList(pointList: DragPoint[]) {
+        public setPointList(pointList: DragPoint[]) {
             this._lineList = [];
             let n:number = pointList.length- 1;
             for(let i:number = 0;i<n;i++)
@@ -39,6 +39,17 @@ namespace View.Line
                 this._lineList.push(line);
             }
             this.draw();
+        }
+        public removeAll():void
+        {
+            let n:number = this._lineList.length;
+            for(let i:number = 0;i<n;i++)
+            {
+                let line:LineObject = this._lineList[i];
+                line.remove();
+            }
+
+            this._lineList = [];
         }
 
         private draw():void

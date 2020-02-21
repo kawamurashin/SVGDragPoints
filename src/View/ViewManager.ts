@@ -1,12 +1,12 @@
-///<reference path="Points/RedPoint.ts"/>
+///<reference path="Points/MovePoint.ts"/>
 ///<reference path="Data/EventData.ts"/>
-///<reference path="Points/BlackPoint.ts"/>
+///<reference path="Points/PinPoint.ts"/>
 ///<reference path="Line/LineManager.ts"/>
 namespace View {
-    import RedPoint = View.Points.RedPoint;
+    import RedPoint = View.Points.MovePoint;
     import DragPoint = View.Points.DragPoint;
     import EventData = View.Data.EventData;
-    import BlackPoint = View.Points.BlackPoint;
+    import BlackPoint = View.Points.PinPoint;
     import LineManager = View.Line.LineManager;
 
     export class ViewManager {
@@ -24,6 +24,9 @@ namespace View {
         //private _marginY:number;
         //private _svg:HTMLElement;
         //private readonly _lineLayer:SVGElement;
+
+        private _dragPointList:DragPoint[] = [];
+
         public static countX:number;
         public static countY:number;
         private readonly _pointLayer:SVGElement;
@@ -52,10 +55,16 @@ namespace View {
         }
         public resize():void
         {
-
-
-
-
+            let n:number = this._dragPointList.length;
+            for(let i:number = 0;i<n;i++)
+            {
+                let dragPoint:DragPoint = this._dragPointList[i];
+                dragPoint.remove();
+            }
+            this._dragPointList = [];
+            this._redPointList = [];
+            //
+            this._lineManager.removeAll();
 
             this.setPoints();
         }
@@ -66,7 +75,7 @@ namespace View {
                 this.mouseDown(eventData);
             };
             this._redPointList = [];
-            let pointList = [];
+            this._dragPointList = [];
             let dragPoint: DragPoint;
 
             /*
@@ -102,36 +111,36 @@ namespace View {
                     dragPoint.y = 10 - 20 * Math.random() + marginY + ViewManager.DISTANCE * Math.floor(i / ViewManager.countX);
                 }
                 dragPoint.addListener("mousedown", handler);
-                pointList.push(dragPoint);
+                this._dragPointList.push(dragPoint);
             }
             let left: DragPoint;
             let right: DragPoint;
             let top: DragPoint;
             let bottom: DragPoint;
-            n = pointList.length;
+            n = this._dragPointList.length;
             for (let i: number = 0; i < n; i++) {
-                dragPoint = pointList[i];
+                dragPoint = this._dragPointList[i];
                 if(Math.floor(i/ViewManager.countX) != 0)
                 {
-                    top = pointList[i - ViewManager.countX];
+                    top = this._dragPointList[i - ViewManager.countX];
                 }
                 if(Math.floor(i/ViewManager.countX) != ViewManager.countY-1)
                 {
-                    bottom = pointList[i + ViewManager.countX];
+                    bottom = this._dragPointList[i + ViewManager.countX];
                 }
                 if(i%ViewManager.countX != ViewManager.countX-1)
                 {
-                    right = pointList[i + 1];
+                    right = this._dragPointList[i + 1];
                 }
                 if(i/ViewManager.countX != 0)
                 {
-                    left = pointList[i - 1];
+                    left = this._dragPointList[i - 1];
                 }
                 dragPoint.setPoints(top,bottom,right,left);
             }
             //Line
             //this._lineManager = new LineManager(this._lineLayer, pointList);
-            this._lineManager.setPointList(pointList);
+            this._lineManager.setPointList(this._dragPointList);
         }
 
         private mouseDown(eventData: EventData): void {

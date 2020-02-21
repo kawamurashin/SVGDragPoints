@@ -1,14 +1,14 @@
 ///<reference path="DragPoint.ts"/>
 namespace View.Points
 {
-    export class RedPoint extends DragPoint{
+    export class MovePoint extends DragPoint{
         private readonly K:number = 0.00001;
         private readonly U:number = 0.0001;
         private _vx:number = 0;
         private _vy:number = 0;
         constructor(g:SVGElement) {
             super(g);
-            this._circle.setAttributeNS(null, "fill", "red");
+            this._circle.setAttributeNS(null, "fill", "#FFF");
         }
         enterFrame(): void {
             super.enterFrame();
