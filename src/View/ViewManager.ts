@@ -28,14 +28,9 @@ namespace View {
             let svg: HTMLElement = document.getElementById("svg");
             let g: SVGElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
             svg.appendChild(g);
-
             this._redPointList = [];
             let pointList = [];
-            let redPoint: RedPoint;
-            let blackPoint: BlackPoint;
             let dragPoint: DragPoint;
-
-
             const marginX: number = 20;
             const marginY: number = 20;
             let dx: number = (400 - (marginX * 2)) / (ViewManager.COUNT_X - 1);
@@ -45,13 +40,17 @@ namespace View {
 
                 if (Math.floor(i / ViewManager.COUNT_X) == 0 || Math.floor(i / ViewManager.COUNT_X) == ViewManager.COUNT_Y - 1 || i % ViewManager.COUNT_X == 0 || i % ViewManager.COUNT_X == ViewManager.COUNT_X - 1) {
                     dragPoint = new BlackPoint(g);
+
+                    dragPoint.x = marginX + dx * (i % ViewManager.COUNT_X);
+                    dragPoint.y = marginY + dy * Math.floor(i / ViewManager.COUNT_X);
                 } else {
                     dragPoint = new RedPoint(g);
-                    this._redPointList.push(dragPoint);
+                    if (dragPoint instanceof RedPoint) {
+                        this._redPointList.push(dragPoint);
+                    }
+                    dragPoint.x = 10 - 20 * Math.random() + marginX + dx * (i % ViewManager.COUNT_X);
+                    dragPoint.y = 10 - 20 * Math.random() + marginY + dy * Math.floor(i / ViewManager.COUNT_X);
                 }
-
-                dragPoint.x = marginX + dx * (i % ViewManager.COUNT_X);
-                dragPoint.y = marginY + dy * Math.floor(i / ViewManager.COUNT_X);
                 dragPoint.addListener("mousedown", handler);
                 pointList.push(dragPoint);
             }
@@ -81,12 +80,18 @@ namespace View {
                 }
                 dragPoint.setPoints(top,bottom,right,left);
             }
-            //線
+            //Line
             this._lineManager = new LineManager(g, pointList);
         }
 
         public enterFrame(): void {
             this._lineManager.enterFrame();
+            let n:number = this._redPointList.length;
+            for(let i:number = 0;i<n;i++)
+            {
+                let redPoint:RedPoint = this._redPointList[i];
+                redPoint.enterFrame();
+            }
         }
 
         private mouseDown(eventData: EventData): void {
@@ -94,7 +99,6 @@ namespace View {
                 window.removeEventListener("mouseup", mouseup);
                 window.removeEventListener("mousemove", mousemove);
                 this.mouseUp();
-
             };
             const mousemove = (e) => {
                 this.mousemoveHandler(e);
@@ -109,19 +113,15 @@ namespace View {
 
         private mouseUp(): void {
             this._dragPoint.mouseUp();
-
         }
 
         private mousemoveHandler(e): void {
             let dx: number = e.screenX - this._preX;
             let dy: number = e.screenY - this._preY;
-
             this._dragPoint.x += dx;
             this._dragPoint.y += dy;
-
             this._preX = e.screenX;
             this._preY = e.screenY;
         }
-
     }
 }

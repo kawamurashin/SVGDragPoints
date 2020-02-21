@@ -5,7 +5,7 @@ namespace View.Line
 
     export class LineManager {
 
-        private _lineList:LineObject[];
+        private readonly _lineList:LineObject[];
         constructor(g:SVGElement , pointList:DragPoint[]) {
 
 
@@ -30,9 +30,6 @@ namespace View.Line
                 let line:LineObject = new LineObject(g,startPoint,endPoint);
                 this._lineList.push(line);
             }
-
-
-
             this.draw();
         }
 

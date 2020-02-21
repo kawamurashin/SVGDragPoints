@@ -6,5 +6,8 @@ namespace View.Points
             super(g);
             this._circle.setAttributeNS(null, "fill", "black");
         }
+        enterFrame(): void {
+            super.enterFrame();
+        }
     }
 }

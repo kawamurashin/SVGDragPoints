@@ -151,12 +151,50 @@ var View;
             __extends(RedPoint, _super);
             function RedPoint(g) {
                 var _this = _super.call(this, g) || this;
+                _this.K = 0.00001;
+                _this.U = 0.0001;
+                _this._vx = 0;
+                _this._vy = 0;
                 _this._circle.setAttributeNS(null, "fill", "red");
                 return _this;
             }
             RedPoint.prototype.enterFrame = function () {
                 _super.prototype.enterFrame.call(this);
+                var dx;
+                var dy;
                 if (!this.isMouseDown) {
+                    if (this._leftPoint) {
+                        dx = this._leftPoint.x - this.x;
+                        this._vx += dx * this.K - this.U * this._vx;
+                        this.x += this._vx;
+                        dy = this._leftPoint.y - this.y;
+                        this._vy += dy * this.K - this.U * this._vy;
+                        this.y += this._vy;
+                    }
+                    if (this._rightPoint) {
+                        dx = this._rightPoint.x - this.x;
+                        this._vx += dx * this.K - this.U * this._vx;
+                        this.x += this._vx;
+                        dy = this._rightPoint.y - this.y;
+                        this._vy += dy * this.K - this.U * this._vy;
+                        this.y += this._vy;
+                    }
+                    if (this._topPoint) {
+                        dx = this._topPoint.x - this.x;
+                        this._vx += dx * this.K - this.U * this._vx;
+                        this.x += this._vx;
+                        dy = this._topPoint.y - this.y;
+                        this._vy += dy * this.K - this.U * this._vy;
+                        this.y += this._vy;
+                    }
+                    if (this._bottomPoint) {
+                        dx = this._bottomPoint.x - this.x;
+                        this._vx += dx * this.K - this.U * this._vx;
+                        this.x += this._vx;
+                        dy = this._bottomPoint.y - this.y;
+                        this._vy += dy * this.K - this.U * this._vy;
+                        this.y += this._vy;
+                    }
                 }
             };
             return RedPoint;
@@ -175,6 +213,9 @@ var View;
                 _this._circle.setAttributeNS(null, "fill", "black");
                 return _this;
             }
+            BlackPoint.prototype.enterFrame = function () {
+                _super.prototype.enterFrame.call(this);
+            };
             return BlackPoint;
         }(Points.DragPoint));
         Points.BlackPoint = BlackPoint;
@@ -236,8 +277,6 @@ var View;
             svg.appendChild(g);
             this._redPointList = [];
             var pointList = [];
-            var redPoint;
-            var blackPoint;
             var dragPoint;
             var marginX = 20;
             var marginY = 20;
@@ -247,13 +286,17 @@ var View;
             for (var i = 0; i < n; i++) {
                 if (Math.floor(i / ViewManager.COUNT_X) == 0 || Math.floor(i / ViewManager.COUNT_X) == ViewManager.COUNT_Y - 1 || i % ViewManager.COUNT_X == 0 || i % ViewManager.COUNT_X == ViewManager.COUNT_X - 1) {
                     dragPoint = new BlackPoint(g);
+                    dragPoint.x = marginX + dx * (i % ViewManager.COUNT_X);
+                    dragPoint.y = marginY + dy * Math.floor(i / ViewManager.COUNT_X);
                 }
                 else {
                     dragPoint = new RedPoint(g);
-                    this._redPointList.push(dragPoint);
+                    if (dragPoint instanceof RedPoint) {
+                        this._redPointList.push(dragPoint);
+                    }
+                    dragPoint.x = 10 - 20 * Math.random() + marginX + dx * (i % ViewManager.COUNT_X);
+                    dragPoint.y = 10 - 20 * Math.random() + marginY + dy * Math.floor(i / ViewManager.COUNT_X);
                 }
-                dragPoint.x = marginX + dx * (i % ViewManager.COUNT_X);
-                dragPoint.y = marginY + dy * Math.floor(i / ViewManager.COUNT_X);
                 dragPoint.addListener("mousedown", handler);
                 pointList.push(dragPoint);
             }
@@ -282,6 +325,11 @@ var View;
         }
         ViewManager.prototype.enterFrame = function () {
             this._lineManager.enterFrame();
+            var n = this._redPointList.length;
+            for (var i = 0; i < n; i++) {
+                var redPoint = this._redPointList[i];
+                redPoint.enterFrame();
+            }
         };
         ViewManager.prototype.mouseDown = function (eventData) {
             var _this = this;

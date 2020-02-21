@@ -26,11 +26,12 @@ namespace View.Points
         protected _y:number = 0;
         protected _circle:SVGElement;
         private _isMouseDown:boolean = false;
-        private _topPoint:DragPoint;
-        private _bottomPoint:DragPoint;
-        private _leftPoint:DragPoint;
-        private _rightPoint:DragPoint;
+        protected _topPoint:DragPoint;
+        protected _bottomPoint:DragPoint;
+        protected _leftPoint:DragPoint;
+        protected _rightPoint:DragPoint;
         constructor(g:SVGElement) {
+
             super();
             const mousedown = (e) =>
             {
