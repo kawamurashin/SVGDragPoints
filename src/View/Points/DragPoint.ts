@@ -5,6 +5,9 @@ namespace View.Points
 {
     import EventData = View.Data.EventData;
     export class DragPoint extends Dispatcher{
+        get isMouseDown(): boolean {
+            return this._isMouseDown;
+        }
         get y(): number {
             return this._y;
         }
@@ -22,6 +25,11 @@ namespace View.Points
         protected _x:number = 0;
         protected _y:number = 0;
         protected _circle:SVGElement;
+        private _isMouseDown:boolean = false;
+        private _topPoint:DragPoint;
+        private _bottomPoint:DragPoint;
+        private _leftPoint:DragPoint;
+        private _rightPoint:DragPoint;
         constructor(g:SVGElement) {
             super();
             const mousedown = (e) =>
@@ -37,8 +45,41 @@ namespace View.Points
 
             g.appendChild(this._circle);
         }
+        public enterFrame():void
+        {
+
+        }
+        public setPoints(top:DragPoint = null , bottom:DragPoint = null, right:DragPoint = null, left:DragPoint = null)
+        {
+            if(top)
+            {
+                this._topPoint = top;
+            }
+            if(bottom)
+            {
+                this._bottomPoint = bottom
+            }
+            if(right)
+            {
+                this._rightPoint = right;
+            }
+            if(left)
+            {
+                this._leftPoint = left;
+            }
+        }
+        public mouseDown():void
+        {
+
+        }
+        public mouseUp():void
+        {
+            this._isMouseDown = false;
+
+        }
         private mouseDownHandler(e)
         {
+            this._isMouseDown = true;
             const eventData:EventData = new EventData();
             eventData.dragPoint = this;
             eventData.mouseX = e.screenX;

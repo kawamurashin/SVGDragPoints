@@ -11,7 +11,7 @@ namespace View {
 
     export class ViewManager {
         private readonly _redPointList: RedPoint[];
-        private readonly _lineManager:LineManager;
+        private readonly _lineManager: LineManager;
 
         private _dragPoint: DragPoint;
         private _preX: number;
@@ -32,8 +32,8 @@ namespace View {
             this._redPointList = [];
             let pointList = [];
             let redPoint: RedPoint;
-            let blackPoint:BlackPoint;
-            let dragPoint:DragPoint;
+            let blackPoint: BlackPoint;
+            let dragPoint: DragPoint;
 
 
             const marginX: number = 20;
@@ -43,10 +43,9 @@ namespace View {
             let n: number = ViewManager.COUNT_X * ViewManager.COUNT_Y;
             for (let i = 0; i < n; i++) {
 
-                if(Math.floor(i/ViewManager.COUNT_X) == 0 || Math.floor(i/ViewManager.COUNT_X) == ViewManager.COUNT_Y-1 || i % ViewManager.COUNT_X == 0 || i % ViewManager.COUNT_X == ViewManager.COUNT_X - 1 )
-                {
+                if (Math.floor(i / ViewManager.COUNT_X) == 0 || Math.floor(i / ViewManager.COUNT_X) == ViewManager.COUNT_Y - 1 || i % ViewManager.COUNT_X == 0 || i % ViewManager.COUNT_X == ViewManager.COUNT_X - 1) {
                     dragPoint = new BlackPoint(g);
-                }else{
+                } else {
                     dragPoint = new RedPoint(g);
                     this._redPointList.push(dragPoint);
                 }
@@ -54,11 +53,36 @@ namespace View {
                 dragPoint.x = marginX + dx * (i % ViewManager.COUNT_X);
                 dragPoint.y = marginY + dy * Math.floor(i / ViewManager.COUNT_X);
                 dragPoint.addListener("mousedown", handler);
-
                 pointList.push(dragPoint);
             }
             //
-            this._lineManager = new LineManager(g , pointList);
+            let left: DragPoint;
+            let right: DragPoint;
+            let top: DragPoint;
+            let bottom: DragPoint;
+            n = pointList.length;
+            for (let i: number = 0; i < n; i++) {
+                dragPoint = pointList[i];
+                if(Math.floor(i/ViewManager.COUNT_X) != 0)
+                {
+                    top = pointList[i - ViewManager.COUNT_X];
+                }
+                if(Math.floor(i/ViewManager.COUNT_X) != ViewManager.COUNT_Y-1)
+                {
+                    bottom = pointList[i + ViewManager.COUNT_X];
+                }
+                if(i%ViewManager.COUNT_X != ViewManager.COUNT_X-1)
+                {
+                    right = pointList[i + 1];
+                }
+                if(i/ViewManager.COUNT_X != 0)
+                {
+                    left = pointList[i - 1];
+                }
+                dragPoint.setPoints(top,bottom,right,left);
+            }
+            //線
+            this._lineManager = new LineManager(g, pointList);
         }
 
         public enterFrame(): void {
@@ -84,6 +108,7 @@ namespace View {
         }
 
         private mouseUp(): void {
+            this._dragPoint.mouseUp();
 
         }
 

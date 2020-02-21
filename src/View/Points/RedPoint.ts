@@ -5,6 +5,16 @@ namespace View.Points
         constructor(g:SVGElement) {
             super(g);
             this._circle.setAttributeNS(null, "fill", "red");
+
+
         }
+        enterFrame(): void {
+            super.enterFrame();
+            if(!this.isMouseDown)
+            {
+
+            }
+        }
+
     }
 }

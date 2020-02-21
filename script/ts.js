@@ -64,6 +64,7 @@ var View;
                 var _this = _super.call(this) || this;
                 _this._x = 0;
                 _this._y = 0;
+                _this._isMouseDown = false;
                 var mousedown = function (e) {
                     _this.mouseDownHandler(e);
                 };
@@ -75,6 +76,13 @@ var View;
                 g.appendChild(_this._circle);
                 return _this;
             }
+            Object.defineProperty(DragPoint.prototype, "isMouseDown", {
+                get: function () {
+                    return this._isMouseDown;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(DragPoint.prototype, "y", {
                 get: function () {
                     return this._y;
@@ -97,7 +105,33 @@ var View;
                 enumerable: true,
                 configurable: true
             });
+            DragPoint.prototype.enterFrame = function () {
+            };
+            DragPoint.prototype.setPoints = function (top, bottom, right, left) {
+                if (top === void 0) { top = null; }
+                if (bottom === void 0) { bottom = null; }
+                if (right === void 0) { right = null; }
+                if (left === void 0) { left = null; }
+                if (top) {
+                    this._topPoint = top;
+                }
+                if (bottom) {
+                    this._bottomPoint = bottom;
+                }
+                if (right) {
+                    this._rightPoint = right;
+                }
+                if (left) {
+                    this._leftPoint = left;
+                }
+            };
+            DragPoint.prototype.mouseDown = function () {
+            };
+            DragPoint.prototype.mouseUp = function () {
+                this._isMouseDown = false;
+            };
             DragPoint.prototype.mouseDownHandler = function (e) {
+                this._isMouseDown = true;
                 var eventData = new EventData();
                 eventData.dragPoint = this;
                 eventData.mouseX = e.screenX;
@@ -120,6 +154,11 @@ var View;
                 _this._circle.setAttributeNS(null, "fill", "red");
                 return _this;
             }
+            RedPoint.prototype.enterFrame = function () {
+                _super.prototype.enterFrame.call(this);
+                if (!this.isMouseDown) {
+                }
+            };
             return RedPoint;
         }(Points.DragPoint));
         Points.RedPoint = RedPoint;
@@ -218,6 +257,27 @@ var View;
                 dragPoint.addListener("mousedown", handler);
                 pointList.push(dragPoint);
             }
+            var left;
+            var right;
+            var top;
+            var bottom;
+            n = pointList.length;
+            for (var i = 0; i < n; i++) {
+                dragPoint = pointList[i];
+                if (Math.floor(i / ViewManager.COUNT_X) != 0) {
+                    top = pointList[i - ViewManager.COUNT_X];
+                }
+                if (Math.floor(i / ViewManager.COUNT_X) != ViewManager.COUNT_Y - 1) {
+                    bottom = pointList[i + ViewManager.COUNT_X];
+                }
+                if (i % ViewManager.COUNT_X != ViewManager.COUNT_X - 1) {
+                    right = pointList[i + 1];
+                }
+                if (i / ViewManager.COUNT_X != 0) {
+                    left = pointList[i - 1];
+                }
+                dragPoint.setPoints(top, bottom, right, left);
+            }
             this._lineManager = new LineManager(g, pointList);
         }
         ViewManager.prototype.enterFrame = function () {
@@ -240,6 +300,7 @@ var View;
             window.addEventListener("mousemove", mousemove);
         };
         ViewManager.prototype.mouseUp = function () {
+            this._dragPoint.mouseUp();
         };
         ViewManager.prototype.mousemoveHandler = function (e) {
             var dx = e.screenX - this._preX;
